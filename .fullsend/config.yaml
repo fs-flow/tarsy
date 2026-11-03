@@ -1,0 +1,41 @@
+# fullsend per-repo configuration
+# https://github.com/fullsend-ai/fullsend
+#
+# This file configures fullsend for per-repo installation mode.
+# See https://fullsend.sh/docs/guides/infrastructure/layered-config-reference
+#
+# This repo has OpenAI credentials only. Codex refuses the fleet harness
+# model (opus), and child agents otherwise fall back to gpt-5.6-luna.
+runtime: codex
+
+agents:
+    - name: triage
+      runtime: codex
+      model: openai/gpt-6-luna
+      subagents:
+        default: openai/gpt-6-luna
+    - name: prioritize
+      runtime: codex
+      model: openai/gpt-6-luna
+      subagents:
+        default: openai/gpt-6-luna
+    - name: code
+      runtime: codex
+      model: openai/gpt-6-luna
+      subagents:
+        default: openai/gpt-6-luna
+    - name: review
+      runtime: codex
+      model: openai/gpt-6-luna
+      subagents:
+        default: openai/gpt-6-luna
+    - name: fix
+      runtime: codex
+      model: openai/gpt-6-luna
+      subagents:
+        default: openai/gpt-6-luna
+    - name: retro
+      runtime: codex
+      model: openai/gpt-6-luna
+      subagents:
+        default: openai/gpt-6-luna
