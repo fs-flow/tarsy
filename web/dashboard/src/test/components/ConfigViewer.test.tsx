@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { SystemConfigResponse } from '../../types/system';
 
@@ -134,5 +134,41 @@ describe('ConfigViewer label maps', () => {
 
     await user.click(await screen.findByText('Label maps'));
     expect(await screen.findByText('builtin')).toBeInTheDocument();
+  });
+
+  it('renders structured object snippets as highlighted YAML', async () => {
+    mockGetSystemConfig.mockResolvedValue(
+      makeConfig(true, {
+        label_maps: {
+          builtin: {
+            multi: false,
+            instructions: 'Apply at most one label: "watch" & review.',
+            labels: [{ label: 'watch', description: 'Look again if it persists.' }],
+          },
+        },
+      }),
+    );
+    const user = userEvent.setup();
+    const { container } = render(<ConfigViewer />);
+
+    await user.click(await screen.findByText('Label maps'));
+    expect(await screen.findByText('builtin')).toBeInTheDocument();
+
+    const yamlKeys = Array.from(container.querySelectorAll('.yaml-key'));
+    expect(yamlKeys.some((key) => key.textContent === 'instructions')).toBe(true);
+    expect(yamlKeys.some((key) => key.textContent?.startsWith('- '))).toBe(true);
+    expect(container.querySelector('.yaml-string')?.textContent).toContain('"watch" & review.');
+    expect(container.querySelector('.yaml-boolean')?.textContent).toBe('false');
+  });
+
+  it('keeps empty sections readable', async () => {
+    mockGetSystemConfig.mockResolvedValue(makeConfig(true));
+    const user = userEvent.setup();
+    render(<ConfigViewer />);
+
+    await user.click(await screen.findByText('Fallback lists'));
+    const fallbackListsSection = screen.getByText('Fallback lists').closest<HTMLElement>('.MuiAccordion-root');
+    expect(fallbackListsSection).not.toBeNull();
+    expect(within(fallbackListsSection!).getByText('None configured.')).toBeVisible();
   });
 });
