@@ -392,7 +392,12 @@ function ChipList({ items }: { items?: string[] | null }) {
 
 function KeyValueBlock({ data }: { data: unknown }) {
   if (data !== null && typeof data === 'object') {
-    return <HighlightedJson data={data as object} maxHeight={360} />;
+    return (
+      <HighlightedYaml
+        source={dumpYaml(data, { lineWidth: 120, noRefs: true, sortKeys: true })}
+        maxHeight={360}
+      />
+    );
   }
   return (
     <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
